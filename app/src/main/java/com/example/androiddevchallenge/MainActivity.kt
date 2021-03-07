@@ -20,8 +20,19 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.material.Button
+import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -35,7 +46,6 @@ import com.example.androiddevchallenge.utils.Utils
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.datetimepicker
 import java.time.ZoneId
-import java.time.temporal.TemporalField
 
 /**
  * @author https://github.com/vincenzopalazzo
@@ -53,7 +63,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
 }
 
 // Start building your app here!
@@ -73,7 +82,6 @@ fun MyApp(viewModel: TimerViewModel = TimerViewModel()) {
     ) { paddingValues ->
         BodyView(viewModel, modifier = Modifier.padding(paddingValues))
     }
-
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -90,26 +98,26 @@ fun BodyView(viewModel: TimerViewModel = TimerViewModel(), modifier: Modifier) {
             Row {
                 Text(text = "Somethings")
             }
-            Row (verticalAlignment = Alignment.CenterVertically
-            ){
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 TimerScreen(viewModel)
             }
             Row(verticalAlignment = Alignment.Bottom) {
                 MainButtonApp(viewModel)
             }
         }
-
     }
 }
 
 @Composable
-fun TimerScreen(timerViewModel: TimerViewModel = TimerViewModel()){
+fun TimerScreen(timerViewModel: TimerViewModel = TimerViewModel()) {
     val time: Long by timerViewModel.time.observeAsState(0L)
     TimerView(timeValue = time)
 }
 
 @Composable
-fun TimerView(timeValue: Long){
+fun TimerView(timeValue: Long) {
     Card(
         elevation = 10.dp,
         modifier = Modifier
@@ -121,7 +129,8 @@ fun TimerView(timeValue: Long){
             text = Utils.formattingTimeStamp(timeValue)
         Text(
             modifier = Modifier.wrapContentWidth(align = Alignment.CenterHorizontally),
-            text = text)
+            text = text
+        )
     }
 }
 
@@ -140,11 +149,13 @@ fun MainButtonApp(viewModel: TimerViewModel = TimerViewModel()) {
             viewModel.createAndRunTimer(millisecond)
         }
     }
-    Button(onClick = {
-        if (viewModel.timerIsRunning())
-            viewModel.cancelTimer()
-        dialog.show()
-    }) {
+    Button(
+        onClick = {
+            if (viewModel.timerIsRunning())
+                viewModel.cancelTimer()
+            dialog.show()
+        }
+    ) {
         Text("Click here")
     }
 }
