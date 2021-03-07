@@ -5,8 +5,8 @@ import java.util.*
 
 object Utils {
 
-    fun formattingTimeStamp(timestamp: Long, pattern: String = "HH:mm:ss"): String {
+    fun formattingTimeStamp(timestamp: Long, pattern: String = "hh:mm:ss"): String {
         val dateFormat = SimpleDateFormat(pattern, Locale.ENGLISH)
-        return dateFormat.format(timestamp);
+        return dateFormat.format(timestamp)
     }
 }

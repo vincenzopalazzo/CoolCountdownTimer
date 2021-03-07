@@ -43,6 +43,7 @@ import java.time.temporal.TemporalField
 class MainActivity : AppCompatActivity() {
     private lateinit var timeViewModel: TimerViewModel
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         timeViewModel = TimerViewModel()
@@ -130,6 +131,8 @@ fun MainButtonApp(viewModel: TimerViewModel = TimerViewModel()) {
     val dialog = MaterialDialog()
     dialog.build {
         datetimepicker { dateTime ->
+            // TODO: Fixed this, this print the data from now, this means 00:54 at the moment
+            // but this is not true, we need to make an operation dateSet - now
             val millisecond = dateTime
                 .atZone(ZoneId.systemDefault())
                 .toInstant()
@@ -137,11 +140,16 @@ fun MainButtonApp(viewModel: TimerViewModel = TimerViewModel()) {
             viewModel.createAndRunTimer(millisecond)
         }
     }
-    Button(onClick = { dialog.show() }) {
+    Button(onClick = {
+        if (viewModel.timerIsRunning())
+            viewModel.cancelTimer()
+        dialog.show()
+    }) {
         Text("Click here")
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview("Light Theme", widthDp = 360, heightDp = 640)
 @Composable
 fun LightPreview() {
@@ -150,6 +158,7 @@ fun LightPreview() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview("Dark Theme", widthDp = 360, heightDp = 640)
 @Composable
 fun DarkPreview() {

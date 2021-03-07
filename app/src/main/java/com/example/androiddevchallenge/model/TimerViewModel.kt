@@ -15,27 +15,29 @@ class TimerViewModel : ViewModel() {
 
     var time: LiveData<Long> = _time
     private var _finished: MutableLiveData<Boolean> = MutableLiveData(true)
-    private var finished: LiveData<Boolean> = _finished;
+    private var finished: LiveData<Boolean> = _finished
 
     /**
      * This method is treagger from the button
      * and the variable time is inizialized with this method
      */
     fun createAndRunTimer(valueTime: Long) {
-        countDownTimer = object: CountDownTimer(valueTime, 100) {
+        countDownTimer = object: CountDownTimer(valueTime, 10) {
             override fun onTick(millisUntilFinished: Long) {
                 _time.value = millisUntilFinished
             }
 
             override fun onFinish() {
-                _time.value = 0L;
+                _time.value = 0L
+                _finished.value = true
             }
         }
         countDownTimer.start()
+        _finished.value = false
     }
 
     fun timerIsRunning(): Boolean{
-        return finished.value == true
+        return finished.value == false
     }
 
     fun cancelTimer(){

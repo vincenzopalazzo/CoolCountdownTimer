@@ -17,7 +17,17 @@ package com.example.androiddevchallenge.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val purple200 = Color(0xFFBB86FC)
-val purple500 = Color(0xFF6200EE)
-val purple700 = Color(0xFF3700B3)
-val teal200 = Color(0xFF03DAC5)
+// by https://www.material-theme.com/docs/reference/color-palette/#material-themes
+// Black
+val activeDark = Color(49, 69, 73)
+val secondBackgroundDark = Color(50, 66, 74)
+val backgroundDark = Color(38, 50, 56)
+val accentDark = Color(0, 150, 136)
+val textDark = Color(96, 125, 139)
+
+// Whithe
+val activeWhite = Color(231, 231, 232)
+val secondBackgroundWhite = Color.White
+val backgroundWhite = Color.White
+val accentWhite = Color(0, 188, 212)
+val textWhite = Color(84, 110, 122)
