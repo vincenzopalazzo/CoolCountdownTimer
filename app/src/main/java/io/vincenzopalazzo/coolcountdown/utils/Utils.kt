@@ -28,10 +28,11 @@ object Utils {
         return dateFormat.format(timestamp)
     }
 
-    fun formattingString(horus: Int, minutes: Int, seconds: Int): String {
+    fun formattingString(horus: Int, minutes: Int, seconds: Int, milliseconds: Int): String {
         var stringHours = horus.toString()
         var stringMinutes = minutes.toString()
         var stringSecond = seconds.toString()
+        var stringMilli = milliseconds.toString()
         if (horus < 9) {
             stringHours = "0%d".format(horus)
         }
@@ -39,6 +40,8 @@ object Utils {
             stringMinutes = "0%d".format(minutes)
         if (seconds < 9)
             stringSecond = "0%d".format(seconds)
+        if (milliseconds < 9)
+            stringMilli = "0%d".format(milliseconds)
         return "%s:%s:%s".format(stringHours, stringMinutes, stringSecond)
     }
 }

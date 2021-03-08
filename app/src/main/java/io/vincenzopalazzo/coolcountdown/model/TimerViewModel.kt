@@ -31,6 +31,7 @@ class TimerViewModel : ViewModel() {
     private var _finished: MutableLiveData<Boolean> = MutableLiveData(true)
     var finished: LiveData<Boolean> = _finished
 
+    var millisecond = 0
     var seconds = 0
     var minutes = 0
     var hours = 0
@@ -40,7 +41,7 @@ class TimerViewModel : ViewModel() {
      * and the variable time is inizialized with this method
      */
     fun createAndRunTimer(valueTime: Long) {
-        countDownTimer = object : CountDownTimer(valueTime, 10) {
+        countDownTimer = object : CountDownTimer(valueTime, 1) {
             override fun onTick(millisUntilFinished: Long) {
                 _time.value = millisUntilFinished
                 convertMillisecondInTimeObject(millisUntilFinished)
@@ -52,6 +53,7 @@ class TimerViewModel : ViewModel() {
                 seconds = 0
                 minutes = 0
                 hours = 0
+                millisecond = 0
             }
         }
         _finished.value = false
@@ -61,6 +63,7 @@ class TimerViewModel : ViewModel() {
     // Source https://stackoverflow.com/a/22641900/10854225
     // FIXME(vincenzopalazzo): Improve this view with a more clean logic
     private fun convertMillisecondInTimeObject(millis: Long) {
+        this.millisecond = (millis / 1000).toInt() % 10
         this.seconds = (millis / 1000).toInt() % 60
         this.minutes = (millis / (1000 * 60) % 60).toInt()
         this.hours = (millis / (1000 * 60 * 60) % 24).toInt()

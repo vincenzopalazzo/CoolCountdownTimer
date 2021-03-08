@@ -16,15 +16,26 @@
 package io.vincenzopalazzo.coolcountdown.home
 
 import android.os.Build
-import android.widget.ListView
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.animateInt
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,6 +47,8 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -49,6 +62,13 @@ import io.vincenzopalazzo.coolcountdown.utils.Utils
 import io.vincenzopalazzo.coolcountdown.R
 import kotlinx.coroutines.launch
 import java.time.*
+import android.net.Uri
+import android.content.Intent
+import android.content.ActivityNotFoundException
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
+import dev.chrisbanes.accompanist.coil.CoilImage
+
 
 /**
  * @author https://github.com/vincenzopalazzo
@@ -75,7 +95,8 @@ fun CoolCountdownApp() {
                 navigationIcon = {
                     Icon(
                         Icons.Filled.Menu, "Munu button",
-                        modifier = Modifier.clickable(onClick = {
+                        modifier = Modifier.height(30.dp).width(30.dp)
+                            .clickable(onClick = {
                             coroutineScope.launch {
                                 scaffoldState.drawerState.open()
                             }
@@ -94,19 +115,85 @@ fun CoolCountdownApp() {
 
 @Composable
 fun DrawerView(modifier: Modifier = Modifier) {
-    Row (
-        modifier = modifier.fillMaxWidth()
-    ){
-        Icon(
-            Icons.Filled.SupervisedUserCircle, "User account",
-        )
-    }
-    val authorRef = listOf("Twitter", "Github")
-    LazyColumn{
-        items(authorRef) { item ->
-            Text(item)
+    Row(
+        modifier = modifier
+            .wrapContentHeight(align = Alignment.Bottom)
+            .fillMaxWidth()
+            .height(140.dp),
+        horizontalArrangement=Arrangement.Center
+    ) {
+        Surface(
+            color = MaterialTheme.colors.surface
+        ) {
+            Column(modifier = Modifier.padding(20.dp),
+                verticalArrangement = Arrangement.Bottom)
+            {
+                CoilImage(
+                    data = "https://avatars.githubusercontent.com/u/17150045?s=460&u=ad52a04f992830b4d4bbe50d3fb6f89ee361537a&v=4",
+                    contentDescription = "Avatar Icon",
+                    modifier = Modifier.size(90.dp)
+                )
+            }
         }
     }
+    val context = LocalContext.current
+    val authorRef = listOf("Twitter", "Github")
+    Surface(
+        color = MaterialTheme.colors.secondary,
+        modifier = modifier.fillMaxSize()
+    ) {
+        LazyColumn {
+            items(authorRef) { item ->
+                Row(verticalAlignment= Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(70.dp)
+                        .clickable(onClick = {
+                            val url: String
+                            if (item === "Twitter") {
+                                url = "https://twitter.com/PalazzoVincenzo"
+                            } else {
+                                url = "https://github.com/vincenzopalazzo"
+                            }
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            try {
+                                context.startActivity(intent)
+                            } catch (ex: ActivityNotFoundException) {
+                                //if Chrome browser not installed
+                                intent.setPackage(null)
+                                context.startActivity(intent)
+                            }
+                        })){
+                    if (item === "Twitter") {
+                        MakeIcon(painter = painterResource(id = R.drawable.ic_twitter),
+                            text="@PalazzoVincenzo",
+                            contentDescription =  "Tweetter Icon")
+                    } else {
+                        MakeIcon(painter = painterResource(id = R.drawable.ic_github),
+                            text="@vincenzopalazzo",
+                            contentDescription =  "Github link")
+                    }
+                }
+                Divider(color = MaterialTheme.colors.background)
+            }
+        }
+    }
+}
+
+@Composable
+fun MakeIcon(painter: Painter, text: String, contentDescription: String? = null){
+    Icon(
+        painter = painter,
+        tint = Color.Unspecified,
+        modifier= Modifier
+            .padding(5.dp)
+            .width(35.dp)
+            .height(35.dp),
+        contentDescription = contentDescription // decorative element
+    )
+    Spacer(modifier = Modifier.width(20.dp))
+    Text(text = text, color = MaterialTheme.colors.onBackground)
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -125,7 +212,7 @@ fun BodyView(
         Spacer(modifier = Modifier.height(10.dp))
         BuildChip("#AndroidDevChallenge")
     }
-    var stateView = remember { mutableStateOf(StatusTimer.STOPPED) }
+    val stateView = remember { mutableStateOf(StatusTimer.STOPPED) }
     val transition = updateTransition(targetState = stateView)
     val state = transition.animateInt { state ->
         when (state.value) {
@@ -174,7 +261,7 @@ fun BodyView(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            TimerScreen(viewModel, stateView)
+            TimerScreen(viewModel)
         }
         Column(
             modifier = modifier
@@ -214,13 +301,16 @@ fun BuildChip(label: String) {
 }
 
 @Composable
-fun TimerScreen(timerViewModel: TimerViewModel, stateView: MutableState<StatusTimer>) {
+fun TimerScreen(timerViewModel: TimerViewModel) {
     val time = timerViewModel.time.observeAsState(0L)
-    TimerView(timerViewModel, timeValue = time, stateView)
+    TimerView(timerViewModel, timeValue = time)
 }
 
 @Composable
-fun TimerView(timerViewModel: TimerViewModel, timeValue: State<Long>, stateView: MutableState<StatusTimer>) {
+fun TimerView(
+    timerViewModel: TimerViewModel,
+    timeValue: State<Long>,
+) {
     Card(
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier
@@ -231,7 +321,12 @@ fun TimerView(timerViewModel: TimerViewModel, timeValue: State<Long>, stateView:
     ) {
         var text = "00:00:00"
         if (timeValue.value != 0L)
-            text = Utils.formattingString(timerViewModel.hours, timerViewModel.minutes, timerViewModel.seconds)
+            text = Utils.formattingString(
+                timerViewModel.hours,
+                timerViewModel.minutes,
+                timerViewModel.seconds,
+                timerViewModel.millisecond
+            )
         // else // TODO restore View when the timer is finished
         //    stateView.value = StatusTimer.STOPPED
         Column(
@@ -241,7 +336,7 @@ fun TimerView(timerViewModel: TimerViewModel, timeValue: State<Long>, stateView:
             Text(
                 style = MaterialTheme.typography.body1,
                 fontFamily = FontFamily(Font(R.font.dsdigitb, weight = FontWeight.Bold)),
-                fontSize = 80.sp,
+                fontSize = 60.sp,
                 color = MaterialTheme.colors.primary,
                 text = text
             )
@@ -258,12 +353,15 @@ fun showSnackBar(text: String, textButton: String, action: () -> Unit) {
             }
         },
         modifier = Modifier.padding(8.dp)
-    ) { Text(text = text)}
+    ) { Text(text = text) }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MainButtonApp(viewModel: TimerViewModel = TimerViewModel(), stateView: MutableState<StatusTimer>) {
+fun MainButtonApp(
+    viewModel: TimerViewModel = TimerViewModel(),
+    stateView: MutableState<StatusTimer>
+) {
     val timerIsFinished = viewModel.finished.observeAsState()
     val snackBarVisible = remember { mutableStateOf(false) }
     val dialog = MaterialDialog()
@@ -281,7 +379,10 @@ fun MainButtonApp(viewModel: TimerViewModel = TimerViewModel(), stateView: Mutab
         }
     }
     if (snackBarVisible.value) {
-        showSnackBar(text = "Wrong value choose", textButton = "Ok", action = { snackBarVisible.value = false })
+        showSnackBar(
+            text = "Wrong value choose",
+            textButton = "Ok",
+            action = { snackBarVisible.value = false })
         return
     }
     OutlinedButton(
@@ -324,9 +425,11 @@ fun MainButtonApp(viewModel: TimerViewModel = TimerViewModel(), stateView: Mutab
                 text = "Setting Timer"
             }
             Spacer(modifier = Modifier.width(10.dp))
-            Text(text,
+            Text(
+                text,
                 color = MaterialTheme.colors.onBackground,
-                modifier = Modifier.align(Alignment.CenterVertically))
+                modifier = Modifier.align(Alignment.CenterVertically)
+            )
         }
     }
     Spacer(
