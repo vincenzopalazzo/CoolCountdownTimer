@@ -16,7 +16,7 @@
 package io.vincenzopalazzo.coolcountdown.utils
 
 import java.text.SimpleDateFormat
-import java.util.Locale
+import java.util.*
 
 /**
  * @author https://github.com/vincenzopalazzo

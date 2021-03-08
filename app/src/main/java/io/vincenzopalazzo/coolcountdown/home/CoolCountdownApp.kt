@@ -13,46 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.coolcountdown
+package io.vincenzopalazzo.coolcountdown.home
 
 import android.os.Build
+import android.widget.ListView
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.animateInt
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
 import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayCircle
-import androidx.compose.material.icons.filled.StopCircle
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
+import androidx.compose.material.icons.filled.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -61,8 +46,9 @@ import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.datetimepicker
 import io.vincenzopalazzo.coolcountdown.model.TimerViewModel
 import io.vincenzopalazzo.coolcountdown.utils.Utils
-import java.time.ZoneId
-import java.util.Date
+import io.vincenzopalazzo.coolcountdown.R
+import kotlinx.coroutines.launch
+import java.time.*
 
 /**
  * @author https://github.com/vincenzopalazzo
@@ -76,17 +62,50 @@ enum class StatusTimer(val state: Int) {
 @Composable
 fun CoolCountdownApp() {
     val viewModel = viewModel(TimerViewModel::class.java)
+    val scaffoldState = rememberScaffoldState()
+    val coroutineScope = rememberCoroutineScope()
     Scaffold(
+        scaffoldState = scaffoldState,
         topBar = {
             TopAppBar(
                 title = {
                     Text(text = "Cool Timer App")
                 },
-                elevation = 12.dp
+                elevation = 12.dp,
+                navigationIcon = {
+                    Icon(
+                        Icons.Filled.Menu, "Munu button",
+                        modifier = Modifier.clickable(onClick = {
+                            coroutineScope.launch {
+                                scaffoldState.drawerState.open()
+                            }
+                        })
+                    )
+                }
             )
-        }
+        },
+        drawerContent = {
+            DrawerView()
+        },
     ) { paddingValues ->
         BodyView(viewModel, modifier = Modifier.padding(paddingValues))
+    }
+}
+
+@Composable
+fun DrawerView(modifier: Modifier = Modifier) {
+    Row (
+        modifier = modifier.fillMaxWidth()
+    ){
+        Icon(
+            Icons.Filled.SupervisedUserCircle, "User account",
+        )
+    }
+    val authorRef = listOf("Twitter", "Github")
+    LazyColumn{
+        items(authorRef) { item ->
+            Text(item)
+        }
     }
 }
 
@@ -115,7 +134,6 @@ fun BodyView(
         }
     }
     if (state.value == 0) {
-
         Column(
             modifier = modifier
                 .fillMaxWidth()
@@ -149,20 +167,6 @@ fun BodyView(
             )
         }
     } else {
-        val dialog = MaterialDialog()
-        dialog.build {
-            datetimepicker { dateTime ->
-                // TODO: Fixed this, this print the data from now, this means 00:54 at the moment
-                // but this is not true, we need to make an operation dateSet - now
-                val millisecond = dateTime
-                    .atZone(ZoneId.systemDefault())
-                    .toInstant()
-                    .toEpochMilli()
-                val milliseconNow = Date().time
-                viewModel.createAndRunTimer(millisecond - milliseconNow)
-            }
-        }
-        dialog.show()
         Column(
             modifier = modifier
                 .fillMaxWidth()
@@ -218,11 +222,11 @@ fun TimerScreen(timerViewModel: TimerViewModel, stateView: MutableState<StatusTi
 @Composable
 fun TimerView(timerViewModel: TimerViewModel, timeValue: State<Long>, stateView: MutableState<StatusTimer>) {
     Card(
-        shape = RoundedCornerShape(4.dp),
+        shape = RoundedCornerShape(8.dp),
         modifier = Modifier
             .wrapContentHeight(align = Alignment.CenterVertically)
             .fillMaxWidth()
-            .padding(10.dp)
+            .padding(30.dp)
             .height(150.dp)
     ) {
         var text = "00:00:00"
@@ -236,7 +240,8 @@ fun TimerView(timerViewModel: TimerViewModel, timeValue: State<Long>, stateView:
         ) {
             Text(
                 style = MaterialTheme.typography.body1,
-                fontSize = 50.sp,
+                fontFamily = FontFamily(Font(R.font.dsdigitb, weight = FontWeight.Bold)),
+                fontSize = 80.sp,
                 color = MaterialTheme.colors.primary,
                 text = text
             )
@@ -244,15 +249,48 @@ fun TimerView(timerViewModel: TimerViewModel, timeValue: State<Long>, stateView:
     }
 }
 
+@Composable
+fun showSnackBar(text: String, textButton: String, action: () -> Unit) {
+    Snackbar(
+        action = {
+            TextButton(onClick = action) {
+                Text(text = textButton)
+            }
+        },
+        modifier = Modifier.padding(8.dp)
+    ) { Text(text = text)}
+}
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MainButtonApp(viewModel: TimerViewModel = TimerViewModel(), stateView: MutableState<StatusTimer>) {
-
+    val timerIsFinished = viewModel.finished.observeAsState()
+    val snackBarVisible = remember { mutableStateOf(false) }
+    val dialog = MaterialDialog()
+    dialog.build {
+        datetimepicker { dateTime ->
+            // TODO: Fixed this, this print the data from now, this means 00:54 at the moment
+            // but this is not true, we need to make an operation dateSet - now
+            val nowTime = LocalDateTime.now()
+            val between = Duration.between(nowTime, dateTime)
+            if (between.isNegative || between.isZero) {
+                snackBarVisible.value = true
+            } else {
+                viewModel.createAndRunTimer(between.toMillis())
+            }
+        }
+    }
+    if (snackBarVisible.value) {
+        showSnackBar(text = "Wrong value choose", textButton = "Ok", action = { snackBarVisible.value = false })
+        return
+    }
     OutlinedButton(
         onClick = {
-            if (viewModel.timerIsRunning()) {
+            if (timerIsFinished.value == false) {
                 viewModel.cancelTimer()
                 stateView.value = StatusTimer.STOPPED
+            } else {
+                dialog.show()
             }
         },
         border = BorderStroke(2.dp, MaterialTheme.colors.primary),
@@ -261,17 +299,34 @@ fun MainButtonApp(viewModel: TimerViewModel = TimerViewModel(), stateView: Mutab
             .wrapContentSize(align = Alignment.Center)
             .wrapContentHeight(align = Alignment.Bottom)
             .height(60.dp)
-            .width(150.dp),
+            .width(180.dp),
         shape = RoundedCornerShape(8.dp),
     ) {
         Row {
-            Icon(
-                Icons.Filled.StopCircle, "Stop Timer",
-                modifier = Modifier
-                    .width(30.dp)
-                    .height(30.dp)
-            )
-            Text("Pause", color = MaterialTheme.colors.onBackground)
+            val text: String
+            if (timerIsFinished.value == false) {
+                Icon(
+                    Icons.Filled.StopCircle, "Stop Timer",
+                    modifier = Modifier
+                        .width(30.dp)
+                        .height(30.dp)
+                        .align(Alignment.CenterVertically)
+                )
+                text = "Stop Timer"
+            } else {
+                Icon(
+                    Icons.Filled.SettingsApplications, "Set timer",
+                    modifier = Modifier
+                        .width(30.dp)
+                        .height(30.dp)
+                        .align(Alignment.CenterVertically)
+                )
+                text = "Setting Timer"
+            }
+            Spacer(modifier = Modifier.width(10.dp))
+            Text(text,
+                color = MaterialTheme.colors.onBackground,
+                modifier = Modifier.align(Alignment.CenterVertically))
         }
     }
     Spacer(

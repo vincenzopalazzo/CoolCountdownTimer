@@ -25,7 +25,7 @@ import androidx.compose.material.primarySurface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.coolcountdown.CoolCountdownApp
+import io.vincenzopalazzo.coolcountdown.home.CoolCountdownApp
 import io.vincenzopalazzo.coolcountdown.ui.theme.MyTheme
 
 /**

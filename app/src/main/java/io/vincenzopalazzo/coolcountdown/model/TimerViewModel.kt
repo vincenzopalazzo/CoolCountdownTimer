@@ -29,7 +29,7 @@ class TimerViewModel : ViewModel() {
 
     var time: LiveData<Long> = _time
     private var _finished: MutableLiveData<Boolean> = MutableLiveData(true)
-    private var finished: LiveData<Boolean> = _finished
+    var finished: LiveData<Boolean> = _finished
 
     var seconds = 0
     var minutes = 0
@@ -54,8 +54,8 @@ class TimerViewModel : ViewModel() {
                 hours = 0
             }
         }
-        countDownTimer.start()
         _finished.value = false
+        countDownTimer.start()
     }
 
     // Source https://stackoverflow.com/a/22641900/10854225
@@ -71,6 +71,8 @@ class TimerViewModel : ViewModel() {
     }
 
     fun cancelTimer() {
+        _finished.value = true
+        _time.value = 0L
         countDownTimer.cancel()
     }
 }

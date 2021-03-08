@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<font-family xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:ignore="UnusedAttribute">
+    <font
+        android:fontStyle="normal"
+        android:fontWeight="200"
+        android:font="@font/dsdigitb"
+        app:fontStyle="normal"
+        app:fontWeight="200"
+        app:font="@font/dsdigitb" />
+</font-family>
