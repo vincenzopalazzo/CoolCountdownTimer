@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.androiddevchallenge.ui.theme
+package io.vincenzopalazzo.coolcountdown.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
@@ -28,6 +28,7 @@ private val DarkColorPalette = darkColors(
     background = backgroundDark,
     onBackground = textDark,
     onSurface = textDark,
+    surface = backgroundDark
 )
 
 private val LightColorPalette = lightColors(

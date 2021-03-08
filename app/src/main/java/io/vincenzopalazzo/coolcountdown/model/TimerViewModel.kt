@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.androiddevchallenge.model
+package io.vincenzopalazzo.coolcountdown.model
 
 import android.os.CountDownTimer
 import androidx.lifecycle.LiveData
@@ -24,13 +24,16 @@ import androidx.lifecycle.ViewModel
  * @author https://github.com/vincenzopalazzo
  */
 class TimerViewModel : ViewModel() {
-
     private var _time: MutableLiveData<Long> = MutableLiveData(0L)
     private lateinit var countDownTimer: CountDownTimer
 
     var time: LiveData<Long> = _time
     private var _finished: MutableLiveData<Boolean> = MutableLiveData(true)
     private var finished: LiveData<Boolean> = _finished
+
+    var seconds = 0
+    var minutes = 0
+    var hours = 0
 
     /**
      * This method is treagger from the button
@@ -40,15 +43,27 @@ class TimerViewModel : ViewModel() {
         countDownTimer = object : CountDownTimer(valueTime, 10) {
             override fun onTick(millisUntilFinished: Long) {
                 _time.value = millisUntilFinished
+                convertMillisecondInTimeObject(millisUntilFinished)
             }
 
             override fun onFinish() {
                 _time.value = 0L
                 _finished.value = true
+                seconds = 0
+                minutes = 0
+                hours = 0
             }
         }
         countDownTimer.start()
         _finished.value = false
+    }
+
+    // Source https://stackoverflow.com/a/22641900/10854225
+    // FIXME(vincenzopalazzo): Improve this view with a more clean logic
+    private fun convertMillisecondInTimeObject(millis: Long) {
+        this.seconds = (millis / 1000).toInt() % 60
+        this.minutes = (millis / (1000 * 60) % 60).toInt()
+        this.hours = (millis / (1000 * 60 * 60) % 24).toInt()
     }
 
     fun timerIsRunning(): Boolean {

@@ -13,15 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.androiddevchallenge.utils
+package io.vincenzopalazzo.coolcountdown
 
-import java.text.SimpleDateFormat
-import java.util.Locale
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
 
-object Utils {
+/**
+ * Instrumented test, which will execute on an Android device.
+ *
+ * See [testing documentation](http://d.android.com/tools/testing).
+ */
+@RunWith(AndroidJUnit4::class)
+class ExampleInstrumentedTest {
+    @get:Rule
+    val composeTestRule = createAndroidComposeRule<MainActivity>()
 
-    fun formattingTimeStamp(timestamp: Long, pattern: String = "hh:mm:ss"): String {
-        val dateFormat = SimpleDateFormat(pattern, Locale.ENGLISH)
-        return dateFormat.format(timestamp)
+    @Test
+    fun sampleTest() {
+        // Add instrumented tests here
     }
 }

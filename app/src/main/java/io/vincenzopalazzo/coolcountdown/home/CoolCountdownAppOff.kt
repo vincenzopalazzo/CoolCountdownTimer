@@ -13,26 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.androiddevchallenge
+package io.vincenzopalazzo.coolcountdown.home
 
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import org.junit.Rule
-import org.junit.Test
-import org.junit.runner.RunWith
-
+// TODO: Subdivide the code of the App in this class
 /**
- * Instrumented test, which will execute on an Android device.
- *
- * See [testing documentation](http://d.android.com/tools/testing).
+ * @author https://github.com/vincenzopalazzo
  */
-@RunWith(AndroidJUnit4::class)
-class ExampleInstrumentedTest {
-    @get:Rule
-    val composeTestRule = createAndroidComposeRule<MainActivity>()
-
-    @Test
-    fun sampleTest() {
-        // Add instrumented tests here
-    }
-}
