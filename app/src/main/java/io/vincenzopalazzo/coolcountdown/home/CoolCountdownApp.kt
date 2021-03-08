@@ -86,7 +86,7 @@ fun CoolCountdownApp() {
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = "Cool Timer App")
+                    Text(text = "Cool Countdown")
                 },
                 elevation = 12.dp,
                 navigationIcon = {

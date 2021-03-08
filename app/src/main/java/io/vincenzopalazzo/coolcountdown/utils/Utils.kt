@@ -15,6 +15,8 @@
  */
 package io.vincenzopalazzo.coolcountdown.utils
 
+import android.content.Context
+import android.preference.PreferenceManager
 import android.util.Log
 import java.text.SimpleDateFormat
 import java.util.Locale
