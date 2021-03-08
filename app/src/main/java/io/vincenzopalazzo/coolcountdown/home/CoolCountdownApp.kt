@@ -15,60 +15,57 @@
  */
 package io.vincenzopalazzo.coolcountdown.home
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.animateInt
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Divider
 import androidx.compose.material.Icon
-import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.vanpra.composematerialdialogs.MaterialDialog
-import com.vanpra.composematerialdialogs.datetime.datetimepicker
-import io.vincenzopalazzo.coolcountdown.model.TimerViewModel
-import io.vincenzopalazzo.coolcountdown.utils.Utils
-import io.vincenzopalazzo.coolcountdown.R
-import kotlinx.coroutines.launch
-import java.time.*
-import android.net.Uri
-import android.content.Intent
-import android.content.ActivityNotFoundException
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.LocalContext
 import dev.chrisbanes.accompanist.coil.CoilImage
-
+import io.vincenzopalazzo.coolcountdown.R
+import io.vincenzopalazzo.coolcountdown.model.TimerViewModel
+import kotlinx.coroutines.launch
 
 /**
  * @author https://github.com/vincenzopalazzo
@@ -95,12 +92,16 @@ fun CoolCountdownApp() {
                 navigationIcon = {
                     Icon(
                         Icons.Filled.Menu, "Munu button",
-                        modifier = Modifier.height(30.dp).width(30.dp)
-                            .clickable(onClick = {
-                            coroutineScope.launch {
-                                scaffoldState.drawerState.open()
-                            }
-                        })
+                        modifier = Modifier
+                            .height(30.dp)
+                            .width(30.dp)
+                            .clickable(
+                                onClick = {
+                                    coroutineScope.launch {
+                                        scaffoldState.drawerState.open()
+                                    }
+                                }
+                            )
                     )
                 }
             )
@@ -120,14 +121,15 @@ fun DrawerView(modifier: Modifier = Modifier) {
             .wrapContentHeight(align = Alignment.Bottom)
             .fillMaxWidth()
             .height(140.dp),
-        horizontalArrangement=Arrangement.Center
+        horizontalArrangement = Arrangement.Center
     ) {
         Surface(
             color = MaterialTheme.colors.surface
         ) {
-            Column(modifier = Modifier.padding(20.dp),
-                verticalArrangement = Arrangement.Bottom)
-            {
+            Column(
+                modifier = Modifier.padding(20.dp),
+                verticalArrangement = Arrangement.Bottom
+            ) {
                 CoilImage(
                     data = "https://avatars.githubusercontent.com/u/17150045?s=460&u=ad52a04f992830b4d4bbe50d3fb6f89ee361537a&v=4",
                     contentDescription = "Avatar Icon",
@@ -144,35 +146,43 @@ fun DrawerView(modifier: Modifier = Modifier) {
     ) {
         LazyColumn {
             items(authorRef) { item ->
-                Row(verticalAlignment= Alignment.CenterVertically,
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(70.dp)
-                        .clickable(onClick = {
-                            val url: String
-                            if (item === "Twitter") {
-                                url = "https://twitter.com/PalazzoVincenzo"
-                            } else {
-                                url = "https://github.com/vincenzopalazzo"
+                        .clickable(
+                            onClick = {
+                                val url: String
+                                if (item === "Twitter") {
+                                    url = "https://twitter.com/PalazzoVincenzo"
+                                } else {
+                                    url = "https://github.com/vincenzopalazzo"
+                                }
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                try {
+                                    context.startActivity(intent)
+                                } catch (ex: ActivityNotFoundException) {
+                                    // if Chrome browser not installed
+                                    intent.setPackage(null)
+                                    context.startActivity(intent)
+                                }
                             }
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            try {
-                                context.startActivity(intent)
-                            } catch (ex: ActivityNotFoundException) {
-                                //if Chrome browser not installed
-                                intent.setPackage(null)
-                                context.startActivity(intent)
-                            }
-                        })){
+                        )
+                ) {
                     if (item === "Twitter") {
-                        MakeIcon(painter = painterResource(id = R.drawable.ic_twitter),
-                            text="@PalazzoVincenzo",
-                            contentDescription =  "Tweetter Icon")
+                        MakeIcon(
+                            painter = painterResource(id = R.drawable.ic_twitter),
+                            text = "@PalazzoVincenzo",
+                            contentDescription = "Tweetter Icon"
+                        )
                     } else {
-                        MakeIcon(painter = painterResource(id = R.drawable.ic_github),
-                            text="@vincenzopalazzo",
-                            contentDescription =  "Github link")
+                        MakeIcon(
+                            painter = painterResource(id = R.drawable.ic_github),
+                            text = "@vincenzopalazzo",
+                            contentDescription = "Github link"
+                        )
                     }
                 }
                 Divider(color = MaterialTheme.colors.background)
@@ -182,11 +192,11 @@ fun DrawerView(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun MakeIcon(painter: Painter, text: String, contentDescription: String? = null){
+fun MakeIcon(painter: Painter, text: String, contentDescription: String? = null) {
     Icon(
         painter = painter,
         tint = Color.Unspecified,
-        modifier= Modifier
+        modifier = Modifier
             .padding(5.dp)
             .width(35.dp)
             .height(35.dp),
@@ -194,85 +204,6 @@ fun MakeIcon(painter: Painter, text: String, contentDescription: String? = null)
     )
     Spacer(modifier = Modifier.width(20.dp))
     Text(text = text, color = MaterialTheme.colors.onBackground)
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-fun BodyView(
-    viewModel: TimerViewModel = TimerViewModel(),
-    modifier: Modifier
-) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .fillMaxHeight(),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(modifier = Modifier.height(10.dp))
-        BuildChip("#AndroidDevChallenge")
-    }
-    val stateView = remember { mutableStateOf(StatusTimer.STOPPED) }
-    val transition = updateTransition(targetState = stateView)
-    val state = transition.animateInt { state ->
-        when (state.value) {
-            StatusTimer.STOPPED -> StatusTimer.STOPPED.state
-            StatusTimer.RUNNING -> StatusTimer.RUNNING.state
-        }
-    }
-    if (state.value == 0) {
-        Column(
-            modifier = modifier
-                .fillMaxWidth()
-                .fillMaxHeight(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            OutlinedButton(
-                onClick = {
-                    stateView.value = StatusTimer.RUNNING
-                },
-                border = BorderStroke(2.dp, MaterialTheme.colors.primary),
-                modifier = Modifier
-                    .padding(10.dp)
-                    .wrapContentSize(align = Alignment.Center)
-                    .wrapContentHeight(align = Alignment.CenterVertically)
-                    .height(150.dp)
-                    .width(150.dp),
-                shape = CircleShape,
-            ) {
-                Icon(
-                    Icons.Filled.PlayCircle, "Run Timer",
-                    modifier = Modifier
-                        .width(30.dp)
-                        .height(30.dp)
-                )
-            }
-            Spacer(
-                modifier = Modifier
-                    .height(30.dp)
-            )
-        }
-    } else {
-        Column(
-            modifier = modifier
-                .fillMaxWidth()
-                .fillMaxHeight(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            TimerScreen(viewModel)
-        }
-        Column(
-            modifier = modifier
-                .fillMaxWidth()
-                .fillMaxHeight(),
-            verticalArrangement = Arrangement.Bottom,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            MainButtonApp(viewModel, stateView)
-        }
-    }
 }
 
 @Composable
@@ -300,140 +231,32 @@ fun BuildChip(label: String) {
     }
 }
 
-@Composable
-fun TimerScreen(timerViewModel: TimerViewModel) {
-    val time = timerViewModel.time.observeAsState(0L)
-    TimerView(timerViewModel, timeValue = time)
-}
-
-@Composable
-fun TimerView(
-    timerViewModel: TimerViewModel,
-    timeValue: State<Long>,
-) {
-    Card(
-        shape = RoundedCornerShape(8.dp),
-        modifier = Modifier
-            .wrapContentHeight(align = Alignment.CenterVertically)
-            .fillMaxWidth()
-            .padding(30.dp)
-            .height(150.dp)
-    ) {
-        var text = "00:00:00"
-        if (timeValue.value != 0L)
-            text = Utils.formattingString(
-                timerViewModel.hours,
-                timerViewModel.minutes,
-                timerViewModel.seconds,
-                timerViewModel.millisecond
-            )
-        // else // TODO restore View when the timer is finished
-        //    stateView.value = StatusTimer.STOPPED
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                style = MaterialTheme.typography.body1,
-                fontFamily = FontFamily(Font(R.font.dsdigitb, weight = FontWeight.Bold)),
-                fontSize = 60.sp,
-                color = MaterialTheme.colors.primary,
-                text = text
-            )
-        }
-    }
-}
-
-@Composable
-fun showSnackBar(text: String, textButton: String, action: () -> Unit) {
-    Snackbar(
-        action = {
-            TextButton(onClick = action) {
-                Text(text = textButton)
-            }
-        },
-        modifier = Modifier.padding(8.dp)
-    ) { Text(text = text) }
-}
-
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MainButtonApp(
+fun BodyView(
     viewModel: TimerViewModel = TimerViewModel(),
-    stateView: MutableState<StatusTimer>
+    modifier: Modifier
 ) {
-    val timerIsFinished = viewModel.finished.observeAsState()
-    val snackBarVisible = remember { mutableStateOf(false) }
-    val dialog = MaterialDialog()
-    dialog.build {
-        datetimepicker { dateTime ->
-            // TODO: Fixed this, this print the data from now, this means 00:54 at the moment
-            // but this is not true, we need to make an operation dateSet - now
-            val nowTime = LocalDateTime.now()
-            val between = Duration.between(nowTime, dateTime)
-            if (between.isNegative || between.isZero) {
-                snackBarVisible.value = true
-            } else {
-                viewModel.createAndRunTimer(between.toMillis())
-            }
-        }
-    }
-    if (snackBarVisible.value) {
-        showSnackBar(
-            text = "Wrong value choose",
-            textButton = "Ok",
-            action = { snackBarVisible.value = false })
-        return
-    }
-    OutlinedButton(
-        onClick = {
-            if (timerIsFinished.value == false) {
-                viewModel.cancelTimer()
-                stateView.value = StatusTimer.STOPPED
-            } else {
-                dialog.show()
-            }
-        },
-        border = BorderStroke(2.dp, MaterialTheme.colors.primary),
-        modifier = Modifier
-            .padding(10.dp)
-            .wrapContentSize(align = Alignment.Center)
-            .wrapContentHeight(align = Alignment.Bottom)
-            .height(60.dp)
-            .width(180.dp),
-        shape = RoundedCornerShape(8.dp),
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .fillMaxHeight(),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row {
-            val text: String
-            if (timerIsFinished.value == false) {
-                Icon(
-                    Icons.Filled.StopCircle, "Stop Timer",
-                    modifier = Modifier
-                        .width(30.dp)
-                        .height(30.dp)
-                        .align(Alignment.CenterVertically)
-                )
-                text = "Stop Timer"
-            } else {
-                Icon(
-                    Icons.Filled.SettingsApplications, "Set timer",
-                    modifier = Modifier
-                        .width(30.dp)
-                        .height(30.dp)
-                        .align(Alignment.CenterVertically)
-                )
-                text = "Setting Timer"
-            }
-            Spacer(modifier = Modifier.width(10.dp))
-            Text(
-                text,
-                color = MaterialTheme.colors.onBackground,
-                modifier = Modifier.align(Alignment.CenterVertically)
-            )
+        Spacer(modifier = Modifier.height(10.dp))
+        BuildChip("#AndroidDevChallenge")
+    }
+    val stateView = remember { mutableStateOf(StatusTimer.STOPPED) }
+    val transition = updateTransition(targetState = stateView)
+    val state = transition.animateInt { state ->
+        when (state.value) {
+            StatusTimer.STOPPED -> StatusTimer.STOPPED.state
+            StatusTimer.RUNNING -> StatusTimer.RUNNING.state
         }
     }
-    Spacer(
-        modifier = Modifier
-            .height(30.dp)
-    )
+    when (state.value) {
+        0 -> MainOffView(stateView = stateView)
+        1 -> MainOnView(viewModel = viewModel, stateView = stateView)
+    }
 }

@@ -15,13 +15,25 @@
  */
 package io.vincenzopalazzo.coolcountdown.utils
 
+import android.util.Log
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 
+enum class LevelTime(private val level: String) {
+    GOOD("GOOD"), // There is enough time,
+    NORMAL("NORMAL"), // Orange last minutes
+    DANGER("DANGER"); // Last 30 seconds
+
+    override fun toString(): String {
+        return "LevelTime(level='$level')"
+    }
+}
 /**
  * @author https://github.com/vincenzopalazzo
  */
 object Utils {
+
+    private var TAG: String = Utils::class.qualifiedName!!
 
     fun formattingTimeStamp(timestamp: Long, pattern: String = "hh:mm:ss"): String {
         val dateFormat = SimpleDateFormat(pattern, Locale.ENGLISH)
@@ -43,5 +55,18 @@ object Utils {
         if (milliseconds < 9)
             stringMilli = "0%d".format(milliseconds)
         return "%s:%s:%s".format(stringHours, stringMinutes, stringSecond)
+    }
+
+    fun checkMissingTime(horus: Int, minutes: Int, seconds: Int, milliseconds: Int): LevelTime {
+        if (horus == 0 && minutes == 0) {
+            if (seconds <= 30) {
+                Log.d(TAG, LevelTime.DANGER.toString())
+                return LevelTime.DANGER
+            } else if (seconds <= 60) {
+                Log.d(TAG, LevelTime.NORMAL.toString())
+                return LevelTime.NORMAL
+            }
+        }
+        return LevelTime.GOOD
     }
 }
